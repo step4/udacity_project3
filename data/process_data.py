@@ -5,6 +5,16 @@ from sqlalchemy import create_engine
 
 
 def load_data(messages_filepath, categories_filepath):
+    """Load disaster messages and disaster categories from CSV files. Categories will be converted in seperate columns with values 1 and 0.
+
+    Args:
+    messages_filepath: string. The filepath to the messages CSV file as string.
+    categories_filepath: string. The filepath to the categories CSV file as string.
+
+    Returns:
+    df: Pandas dataframe. The pandas dataframe containing all messages and categories in each row.
+    """
+    
     # load messages dataset
     messages = pd.read_csv(messages_filepath)
     
@@ -46,6 +56,15 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+     """Clean the dataframe containing the disaster messages and categories. Missing values and duplicates are dropped.
+
+    Args:
+    df: Pandas dataframe. The pandas dataframe containing all messages and categories in each row WITH duplicates and missing values.
+
+    Returns:
+    df: Pandas dataframe. The pandas dataframe containing all messages and categories in each row WITHOUT duplicates and missing values.
+    """
+        
     # drop duplicates
     df = df.drop_duplicates()
                                                     
@@ -56,6 +75,13 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    """Saving the dataframe as a specific sql file.
+
+    Args:
+    df: Pandas dataframe. The cleaned pandas dataframe containing all messages and categories.
+    database_filename: sting. The path where the sql file should be saved.
+    """
+    
     engine = create_engine(f'sqlite:///{database_filename}')
     df.to_sql(database_filename, engine, index=False)
 
