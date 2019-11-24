@@ -98,7 +98,7 @@ def build_model():
              
     parameters = {
         'vect__ngram_range': ((1, 1), (1, 2)),
-        'vect__max_df': (0.5, 1.0),
+#         'vect__max_df': (0.5, 1.0),
         'vect__max_features': (None, 10000),
         'tfidf__smooth_idf': (True, False),
         'clf__estimator__n_estimators': [50, 100],
