@@ -15,22 +15,46 @@ from sqlalchemy import create_engine
 app = Flask(__name__)
 
 def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
+    """Tokenize a string of text. Following steps a done: remove punctuation, split sentence in words, remove stop words, lemmatize wors, stem words, convert word to lowercase and remove all leading/trailing whitespace of word.
 
+    Args:
+    text: string. Text to tokenize.
+
+    Returns:
+    clean_tokens: list of strings. Each list item contains a clean token after tokenization.
+    """
+             
+    #remove punctuation
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text) 
+    
+    # tokenize text
+    tokens = word_tokenize(text)
+    
+    # Remove stop words
+    tokens = [t for t in tokens if t not in stopwords.words("english")]
+    
+    # initiate lemmatizer
+    lemmatizer =WordNetLemmatizer()
+    stemmer = PorterStemmer()
+
+    # iterate through each token
     clean_tokens = []
     for tok in tokens:
+        
+        # lemmatize, normalize case, and remove leading/trailing white space
         clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        # stem word
+        clean_tok = stemmer.stem(clean_tok)
         clean_tokens.append(clean_tok)
 
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///../data/YourDatabaseName.db')
-df = pd.read_sql_table('YourTableName', engine)
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
+df = pd.read_sql_table('DisasterResponse', engine)
 
 # load model
-model = joblib.load("../models/your_model_name.pkl")
+model = joblib.load("../models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
