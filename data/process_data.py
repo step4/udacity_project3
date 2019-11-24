@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # import libraries
 import sys
 import pandas as pd
@@ -56,7 +57,7 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
-     """Clean the dataframe containing the disaster messages and categories. Missing values and duplicates are dropped.
+    """Clean the dataframe containing the disaster messages and categories. Missing values and duplicates are dropped.
 
     Args:
     df: Pandas dataframe. The pandas dataframe containing all messages and categories in each row WITH duplicates and missing values.
@@ -64,13 +65,13 @@ def clean_data(df):
     Returns:
     df: Pandas dataframe. The pandas dataframe containing all messages and categories in each row WITHOUT duplicates and missing values.
     """
-        
+
     # drop duplicates
-    df = df.drop_duplicates()
-                                                    
+    df=df.drop_duplicates()
+    
     # drop missing values
     df = df.dropna()
-    
+
     return df
 
 
@@ -82,8 +83,11 @@ def save_data(df, database_filename):
     database_filename: sting. The path where the sql file should be saved.
     """
     
+    table_name=database_filename.split("/")[1].split('.')[0]
+    
     engine = create_engine(f'sqlite:///{database_filename}')
-    df.to_sql(database_filename, engine, index=False)
+    
+    df.to_sql(table_name, engine, index=False)
 
 
 def main():
