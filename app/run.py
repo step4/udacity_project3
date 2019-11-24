@@ -1,13 +1,18 @@
 import json
 import plotly
 import pandas as pd
+import re
 
-from nltk.stem import WordNetLemmatizer
+import nltk
+nltk.download(['punkt','averaged_perceptron_tagger','stopwords','wordnet'])
+from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.stem.porter import PorterStemmer
+from nltk.stem.wordnet import WordNetLemmatizer
 
 from flask import Flask
 from flask import render_template, request, jsonify
-from plotly.graph_objs import Bar
+from plotly.graph_objs import Bar,Histogram
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
@@ -56,35 +61,71 @@ df = pd.read_sql_table('DisasterResponse', engine)
 # load model
 model = joblib.load("../models/classifier.pkl")
 
+# extract data needed for visuals
+df_categories =  df.drop(columns=['id','message','original','genre'])
+categories_count=list(df_categories.sum(axis=0))
+categories_names = list(df_categories.columns)
+
+df_messages = df['message']
+token_count = list(df_messages.apply(lambda x: len(tokenize(x))))
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
     
-    # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
-    genre_counts = df.groupby('genre').count()['message']
-    genre_names = list(genre_counts.index)
-    
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    x=categories_names,
+                    y=categories_count
                 )
             ],
 
             'layout': {
-                'title': 'Distribution of Message Genres',
+                'autosize':False,
+                'title': 'Distribution of Categories',
                 'yaxis': {
                     'title': "Count"
                 },
                 'xaxis': {
-                    'title': "Genre"
+                    'title': "Category",
+                    'tickangle':45
+                },
+                'margin':{
+                    'l':75,
+                    'r':50,
+                    'b':200,
+                    't':50,
+                    'pad':4
+                }
+            }
+        },
+        {
+            'data': [
+                Histogram(
+                    x=token_count
+                )
+            ],
+
+            'layout': {
+                'autosize':False,
+                'title': 'Distribution of message length',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Message length",
+                    'tickangle':45
+                },
+                'margin':{
+                    'l':75,
+                    'r':50,
+                    'b':200,
+                    't':50,
+                    'pad':4
                 }
             }
         }
